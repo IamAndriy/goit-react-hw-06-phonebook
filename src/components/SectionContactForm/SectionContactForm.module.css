@@ -70,3 +70,13 @@ background-color:rgb(203, 163, 111);
     margin-bottom: 20px;
 }
 }
+
+.error{
+    background-color: rgb(227, 118, 59);
+    color: white;
+}
+
+.success{
+    background-color: rgb(113, 184, 62);
+    color: white;
+}

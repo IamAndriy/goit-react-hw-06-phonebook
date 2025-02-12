@@ -1,23 +1,30 @@
-import css from "./ContactList.module.css";
-import {ContactItem} from "../ContactItem/ContactItem";
+import { useSelector } from "react-redux";
+import { getContacts } from "../../redux/selectors";
+import { getFilter } from "../../redux/selectors";
+import { ContactItem } from "../ContactItem/ContactItem";
 import { nanoid } from "nanoid";
-import PropTypes from "prop-types";
+import css from "./ContactList.module.css";
 
-export const ContactList = ({contacts, onDelContact }) => {
+export const ContactList = () => {
 
-    return  <ul className={css["contact-list"]}>
-                {contacts.map(item => <ContactItem key={nanoid()} 
-                                                id={item.id} 
-                                                name={item.name} 
-                                                number={item.number} 
-                                                onDelContact={onDelContact}
-                                    />
-                            )
-                }
-            </ul>
+    const contacts = useSelector(getContacts);
+    const filter = useSelector(getFilter);
+    
+    const getVisibleContacts = () => {
+        return contacts.filter(contact => contact.name.toLowerCase().includes(filter.trim().toLowerCase()));
+    }
+
+    const visibleContacts = getVisibleContacts();
+
+    return  <> 
+            { (visibleContacts.length > 0) 
+                ?   <ul className={css["contact-list"]}>
+                        { visibleContacts.map( ({id, name, number}) => < ContactItem key={nanoid()} id={id} name={name} number={number}/> ) }
+                    </ul>
+                :   (filter.trim())
+                        ? <p className={css.massage}>There are no contacts you are looking for</p>
+                        : <p className={css.massage}>There are no contacts in the phone book yet</p>
+            }
+            </>
 }
 
-ContactList.propTypes = {
-    contacts: PropTypes.arrayOf(PropTypes.object),
-    onDelContact: PropTypes.func,
-}

@@ -62,3 +62,7 @@
     }
 }
 
+.delSuccess{
+    background-color: rgb(124, 124, 123);
+    color: white;
+}

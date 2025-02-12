@@ -1,38 +1,40 @@
-import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { addContact } from "../../redux/contactsSlice";
+import { getContacts } from "../../redux/selectors";
+import { toast } from "react-toastify";
 import css from "./SectionContactForm.module.css";
-import PropTypes from "prop-types";
 
-export const SectionContactForm = ({onAdd}) => {
+export const SectionContactForm = () => {
 
-    const [name, setName] = useState("");
-    const [number, setNumber] = useState("");
-
-    const reset = () => { 
-        setName("");
-        setNumber("");
-    }
+    const contacts = useSelector(getContacts);
+    const dispatch = useDispatch();
 
     const onSubmitHandle = (e) => {
+
         e.preventDefault();
-        onAdd({name, number});
-        reset();        
-    }
 
-    const onChangeFormInput = ({target}) => {
+        const form = e.target;
+        const name = form.elements.name.value;
+        const number = form.elements.number.value;
 
-        switch (target.name){
-            case "name": 
-                        setName(target.value);
-                        break;
-            case "number": 
-                        setNumber(target.value);
-                        break;
-            default: break;
+        if (contacts.some(contact => contact.name === name)){
+            toast(`The contact <${name}> is elready existing!`, {closeButton: false, 
+                                                                 ariaLabel: 'The contact is elready existing', 
+                                                                 className: `${css.error}`});
+        } else {
+            dispatch(addContact(name, number));
+            toast(`The contact <${name} , ${number}> was added to the book`, { closeButton: false, 
+                                                                               ariaLabel: 'The contact was added to the book', 
+                                                                               className: `${css.success}`});
         }
+
+        form.reset();
     }
 
     return  <section className={css.section}>
+
                 <h2 className={css["visually-hidden"]}>Form for adding new contacts</h2>
+
                 <form className={css.form} onSubmit={onSubmitHandle} >
 
                     <label className={css.label} aria-label="Person name input">Name
@@ -40,12 +42,10 @@ export const SectionContactForm = ({onAdd}) => {
                                 id="name" 
                                 type="text" 
                                 name="name" 
-                                value={name} 
                                 required 
                                 autoComplete="off" 
-                                placeholder="Name/Sername"
+                                placeholder="Name Sername"
                                 pattern="^([a-zA-Z][ ]*){2,50}$"
-                                onChange={onChangeFormInput}
                         />
                         <p className={css.massage}>Name must be 2-50 chars long and contain only latin letters and whitespaces</p>
                     </label>
@@ -55,12 +55,10 @@ export const SectionContactForm = ({onAdd}) => {
                                 id="number"
                                 type="tel"
                                 name="number"
-                                value={number}
                                 required
                                 autoComplete="off"
                                 placeholder="xxx xxx xx xx"
                                 pattern="^([0-9][ ]*){8,20}$"
-                                onChange={onChangeFormInput}
                         />
                         <p className={css.massage}>Phone number must be 8-20 chars long and contain only digits and whitespaces</p>
                     </label>
@@ -68,10 +66,7 @@ export const SectionContactForm = ({onAdd}) => {
                     <button className={css.btn} type="submit" aria-label="Add contact">Add contact</button>
 
                 </form>
+
             </section>
                 
-}
-
-SectionContactForm.propTypes = {
-    onAdd: PropTypes.func,
 }
